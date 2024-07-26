@@ -1,50 +1,58 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api.js";
 import ErrorAlert from "../layout/ErrorAlert";
+import { useHistory } from "react-router-dom";
 import ReservationForm from "./ReservationForm.js";
 
 function NewReservation({ date }) {
-    const history = useHistory();
-    const [reservationError, setReservationError] = useState(null);
     const [reservation, setReservation] = useState({
         first_name: "",
         last_name: "",
         mobile_number: "",
         reservation_date: "",
         reservation_time: "",
-        people: 0
+        people: 1
     })
-    const changeHandler = ({ target }) => {
-            setReservation({
-                ...reservation,
-                [target.name]: target.value
-            });
-        }
+    const [error, setError] = useState(null);
+    const history = useHistory();
 
-    function submitHandler(event) {
-        event.preventDefault();
-        createReservation({
-            ...reservation,
-            people: Number(reservation.people),
-        })
+    // const changeHandler = (event) => {
+    //     setReservation({
+    //         ...reservation,
+    //         [event.target.name]: event.target.value
+    //     });
+    // }
+
+    const cancelHandler = () => {
+        history.goBack()
+    }
+
+    const submitHandler = (reservation) => {
+        const abortController = new AbortController();
+        createReservation(
+            reservation,
+        //    people: Number(reservation.people),
+            abortController.signal
+        )
         .then(() => {
             history.push(`/dashboard?date=${reservation.reservation_date}`);
         })
-        .catch(setReservationError);
+        .catch(setError);
+        return () => abortController.abort()
     }
 
     return (
-        <main>
-            <h1>New Reservation</h1>
-            <ErrorAlert error={reservationError} />
+        <>
+            <h2> New Reservation </h2>
+            <ErrorAlert error={error} />
             <ReservationForm
-                reservation={reservation}
-                changeHandler={changeHandler}
-                submitHandler={submitHandler}
+            //    reservation={reservation}
+            //    changeHandler={changeHandler}
+                onCancel={cancelHandler}
+                onSubmit={submitHandler}
             />
-        </main>
-    )
+        </>
+    );
 }
 
 export default NewReservation;
