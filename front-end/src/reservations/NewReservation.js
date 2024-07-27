@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createReservation } from "../utils/api.js";
 import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory } from "react-router-dom";
@@ -11,10 +11,14 @@ function NewReservation({ date }) {
         mobile_number: "",
         reservation_date: "",
         reservation_time: "",
-        people: 1
+        people: 0,
     })
     const [error, setError] = useState(null);
     const history = useHistory();
+
+    useEffect(() => {
+        return reservation
+    }, [reservation])
 
     const changeHandler = (event) => {
         if (event.target.name === "people") {

@@ -93,7 +93,7 @@ export async function updateReservation(reservation, signal) {
   const options = {
     method: "PUT",
     headers,
-    body: JSON.stringify({ data: reservation }),
+    body: JSON.stringify({ data: { ...reservation } }),
     signal,
   };
   return await fetchJson(url, options, reservation)

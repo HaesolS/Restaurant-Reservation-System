@@ -4,21 +4,29 @@ import ErrorAlert from "../layout/ErrorAlert";
 import { useHistory, useParams } from "react-router-dom";
 import ReservationForm from "./ReservationForm";
 
-function EditReservation({ date }) {
+function EditReservation() {
+    const initialState = {
+      first_name: "alfonso",
+      last_name: "",
+      mobile_number: "",
+      reservation_date: "",
+      reservation_time: "",
+      people: 0,
+    }
     const { reservation_id } = useParams();
-    const [reservation, setReservation] = useState({reservation_id});
+    const [reservation, setReservation] = useState({ ...initialState });
     const [error, setError] = useState(null);
     const history = useHistory();
     
     useEffect(() => {
-      readReservation(reservation_id)
-      .then((response) => {
-        setReservation({
-          ...response,
-          people: Number(response.people),
-        })
-      })
+      const abortController = new AbortController();
+      setError(null);
+      readReservation(reservation_id, abortController.signal)
+      .then(setReservation)
       .catch(setError);
+
+
+      return () => abortController.abort();
     }, [reservation_id]);
      
     const changeHandler = (event) => {
@@ -37,15 +45,14 @@ function EditReservation({ date }) {
     
     const submitHandler = (event) => {
       event.preventDefault();
-      updateReservation({
-        ...reservation,
-        people: Number(reservation.people),
-      })
+      const abortController = new AbortController();
+      updateReservation(reservation, abortController.signal)
       .then((res) => {
         setReservation({ ...res });
         history.push(`/dashboard?date=${reservation.reservation_date}`);
       })
       .catch(setError);
+      return () => abortController.abort();
     }
   
     return (

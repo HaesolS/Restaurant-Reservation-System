@@ -66,6 +66,7 @@ const hasRequiredProperties = hasProperties(
 
 
 function validDate(req, res, next) {
+  console.log("validDate")
   const { reservation_date, reservation_time } = req.body.data;
   const reservationDate = new Date(
       `${reservation_date}T${reservation_time}:00Z`
@@ -96,6 +97,7 @@ function validDate(req, res, next) {
 }
 
 function validTime(req, res, next) {
+  console.log("validTime")
   let hours = res.locals.time.getUTCHours();
     let minutes = res.locals.time.getUTCMinutes();
     if (
@@ -113,6 +115,7 @@ function validTime(req, res, next) {
 }
 
 function validPeople(req, res, next) {
+  console.log("validPeople")
   let { people } = req.body.data;
   if (typeof people !== "number" || people < 1) {
       next({
@@ -124,6 +127,7 @@ function validPeople(req, res, next) {
 }
 
 function validStatus(req, res, next) {
+  console.log("validStatus")
   const { status } = req.body.data;
   if (status !== 'seated' && status !== 'finished') {
     return next();
@@ -134,17 +138,18 @@ function validStatus(req, res, next) {
   })
 }
 
-function reservationExists(req, res, next) {
-  const { reservation_id } = req.params
-  const reservation = service.read(reservation_id);
-  res.locals.reservation = reservation;
-  if (!reservation) {
-    next({
-      status: 404,
-      message: `Reservation ${reservation_id} not found.`
-    });
+async function reservationExists(req, res, next) {
+  console.log("reservationExists")
+  // const { reservation_id } = req.params
+  const reservation = await service.read(req.params.reservation_id);
+  if (reservation) {
+    res.locals.reservation = reservation;
+    return next();
   }
-  next();
+  next({
+    status: 404,
+    message: `Reservation ${req.params.reservation_id} not found.`
+  });
 }
 
 /**
@@ -173,6 +178,7 @@ async function list(req, res) {
 }
 
 async function read(req, res) {
+  console.log("read")
   const data = res.locals.reservation;
   res.json({ data });
 }
@@ -183,6 +189,7 @@ async function create(req, res) {
 }
 
 async function update(req, res) {
+  console.log("update")
   const updated = {
     ...req.body.data,
     reservation_id: res.locals.reservation.reservation_id,
