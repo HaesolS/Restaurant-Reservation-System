@@ -16,22 +16,30 @@ function NewReservation({ date }) {
     const [error, setError] = useState(null);
     const history = useHistory();
 
-    // const changeHandler = (event) => {
-    //     setReservation({
-    //         ...reservation,
-    //         [event.target.name]: event.target.value
-    //     });
-    // }
-
-    const cancelHandler = () => {
-        history.goBack()
+    const changeHandler = (event) => {
+        if (event.target.name === "people") {
+            setReservation({
+                ...reservation,
+                [event.target.name]: Number(event.target.value)
+            });
+        } else {
+            setReservation({
+            ...reservation,
+            [event.target.name]: event.target.value
+        });
+        }
     }
 
-    const submitHandler = (reservation) => {
+    // const cancelHandler = () => {
+    //     history.goBack()
+    // }
+
+    const submitHandler = (event) => {
+        event.preventDefault();
         const abortController = new AbortController();
+
         createReservation(
             reservation,
-        //    people: Number(reservation.people),
             abortController.signal
         )
         .then(() => {
@@ -46,10 +54,9 @@ function NewReservation({ date }) {
             <h2> New Reservation </h2>
             <ErrorAlert error={error} />
             <ReservationForm
-            //    reservation={reservation}
-            //    changeHandler={changeHandler}
-                onCancel={cancelHandler}
-                onSubmit={submitHandler}
+                reservation={reservation}
+                changeHandler={changeHandler}
+                submitHandler={submitHandler}
             />
         </>
     );

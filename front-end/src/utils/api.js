@@ -87,6 +87,7 @@ export async function createReservation(reservation, signal) {
 }
 
 export async function updateReservation(reservation, signal) {
+  console.log("reservation", reservation)
   const { reservation_id } = reservation;
   const url = `${API_BASE_URL}/reservations/${reservation_id}`;
   const options = {

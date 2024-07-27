@@ -1,46 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
 
 export const ReservationForm = ({
-  initialState = {
-    first_name: "",
-    last_name: "",
-    mobile_number: "",
-    reservation_date: "",
-    reservation_time: "",
-    people: 1
-  },
-  //changeHandler,
-  onCancel,
-  onSubmit,
+    reservation,
+    changeHandler,
+    submitHandler
 }) => {
   const history = useHistory();
 
-    const [reservation, setReservation] = useState(initialState)
-
-    const numberChangeHandler = (event) => {
-        setReservation({
-            ...reservation,
-            [event.target.name]: Number(event.target.value)
-        });
-    }
-
-    const changeHandler = (event) => {
-        setReservation({
-            ...reservation,
-            [event.target.name]: event.target.value
-        });
-    }
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("reservation", reservation)
-    onSubmit(reservation)
-}
+    
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={submitHandler}>
             <div>
                 <label htmlFor="first_name">
                     First Name
@@ -117,14 +89,14 @@ export const ReservationForm = ({
                 required
                 value={reservation.people}
                 min={1}
-                onChange={numberChangeHandler}
+                onChange={changeHandler}
             />
             <small> Enter number of people... </small>
             </div>
             <button type="submit">
                 Submit
             </button>
-            <button type="button" onClick={onCancel}>
+            <button type="button" onClick={() => history.goBack()}>
                 Cancel
             </button>
             </form>

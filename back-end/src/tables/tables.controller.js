@@ -52,6 +52,12 @@ function validCapacity(req, res, next) {
       message: "capacity must be at least 1 person."
     });
   }
+  if (!Number.isInteger(res.locals.table.capacity)) {
+    return next({
+      status: 400,
+      message: "capacity is not a number."
+    })
+  }
   next();
 }
 
@@ -66,16 +72,6 @@ function validTableCapacity(req, res, next) {
   } else {
     next();
   }
-}
-
-function capacityIsNumber(req, res, next) {
-  if (!Number.isInteger(res.locals.table.capacity)) {
-    return next({
-      status: 400,
-      message: "capacity is not a number."
-    })
-  }
-  next();
 }
 
 function validTable(req, res, next) {
@@ -153,14 +149,14 @@ module.exports = {
   list: asyncErrorBoundary(list),
   create: [
     hasRequiredProperties,
-      validTableName, validCapacity, validTableCapacity, capacityIsNumber,
+      validTableName, validCapacity, validTableCapacity,
       asyncErrorBoundary(create)
   ],
   update: [
   hasRequiredProperties,
     tableExists,
     reservationExists,
-  //  validCapacity, validTable, validTableCapacity, capacityIsNumber,
+    validCapacity, validTable, validTableCapacity,
     isOccupied,
     asyncErrorBoundary(update)
   ],

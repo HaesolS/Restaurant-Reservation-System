@@ -22,11 +22,18 @@ function EditReservation({ date }) {
     }, [reservation_id]);
      
     const changeHandler = (event) => {
-      setReservation({
-        ...reservation,
-        [event.target.name]: event.target.value,
+      if (event.target.name === "people") {
+          setReservation({
+              ...reservation,
+              [event.target.name]: Number(event.target.value)
+          });
+      } else {
+          setReservation({
+          ...reservation,
+          [event.target.name]: event.target.value
       });
-    }
+      }
+  }
     
     const submitHandler = (event) => {
       event.preventDefault();
