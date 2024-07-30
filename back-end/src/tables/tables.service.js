@@ -13,53 +13,42 @@ function create(table) {
       .then((createdRecords) => createdRecords[0]);
 }
   
-async function update(reservation_id, table_id) {
-    const trx = await knex.transaction();
-    return trx("reservations")
-        .where({ reservation_id })
-        .update({ status: "seated" })
-        .then(() =>
-            trx("tables")
-            .where({ table_id })
-            .update({ reservation_id: reservation_id, table_status: "occupied" }, "*")
-        )
-        .then(trx.commit)
-        .catch(trx.rollback);
-}
-
-async function destroy(reservation_id, table_id) {
-    const trx = await knex.transaction();
-    return trx("reservations")
-        .where({ reservation_id })
-        .update({ status: "finished" })
-        .then(() =>
-            trx("tables")
-            .where({ table_id })
-            .update({ reservation_id: null, table_status: "free" }, "*")
-        )
-        .then(trx.commit)
-        .catch(trx.rollback)
-}
-
-function readReservation(reservation_id) {
-    return knex("reservations as r")
+async function update(updatedTable, updatedReservation) {
+  const trx = await knex.transaction();
+  return trx("tables")
     .select("*")
-    .where({ reservation_id })
-    .first();
+    .where({"table_id": updatedTable.table_id})
+    .update(updatedTable, "*")
+    .then(updatedRecords => updatedRecords[0])
+    .then(() => {
+      return trx("reservations")
+        .select("*")
+        .where({"reservation_id": updatedReservation.reservation_id})
+        .update(updatedReservation, "*")
+        .then(updatedResRecords => updatedResRecords[0]);
+    })
+    .then(trx.commit)
+    .catch(trx.rollback);
 }
 
 function read(table_id) {
     return knex("tables")
     .select("*")
-    .where({ table_id })
+    .where({ "table_id": table_id })
     .first();
+}
+
+function readReservation(reservation_id) {
+  return knex("reservations")
+  .select("*")
+  .where({ "reservation_id": reservation_id })
+  .first();
 }
   
 module.exports = {
     list,
     create,
     update,
-    destroy,
-    readReservation,
     read,
+    readReservation
   };

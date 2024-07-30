@@ -1,69 +1,82 @@
 import React, { useState } from "react";
 import { createTable } from "../utils/api";
-import ErrorAlert from "../layout/ErrorAlert";
+import ReservationError from "../layout/ReservationError";
 import { useHistory } from "react-router-dom";
 
-function NewTable() {
-  const [table, setTable] = useState({
+export const NewTable = () => {
+  const initialTableState = {
     table_name: "",
-    capacity: 0
+    capacity: 0,
+  };
+
+  const [table, setTable] = useState({
+    ...initialTableState,
   });
   const [error, setError] = useState(null);
   const history = useHistory();
 
   const changeHandler = (event) => {
-    setTable({
-      ...table,
-      [event.target.name]: event.target.value
-    });
+    if (event.target.name === "capacity") {
+      setTable({
+        ...table,
+        [event.target.name]: Number(event.target.value),
+      });
+    } else {
+      setTable({
+        ...table,
+        [event.target.name]: event.target.value,
+      });
+    }
   };
 
   const submitHandler = (event) => {
     event.preventDefault();
-    createTable(table)
-    .then(() => {
-      history.push(`/dashboard`);
-    })
-    .catch(setError);
-  }
+    const abortController = new AbortController();
+    createTable(table, abortController.signal)
+      .then(history.push(`/dashboard`))
+      .catch(setError);
+    return () => abortController.abort();
+  };
 
   return (
-    <main>
-      <h2>New Table</h2>
-      <ErrorAlert error={error} />
+    <>
+      <h2>Create a Table:</h2>
+      <ReservationError errors={error} />
       <form onSubmit={submitHandler}>
-        <div>
-          <label htmlFor="table_name"> Table Name </label>
-          <input
-            id="table_name"
-            name="table_name"
-            type="text"
-            required
-            value={table.table_name}
-            onChange={changeHandler}
-          />
-          <small> Enter table name... </small>
-        </div>
-        <div>
-        <label htmlFor="capacity"> Capacity </label>
-        <input
-          id="capacity"
-          name="capacity"
-          type="number"
-          required
-          value={table.capacity}
-          onChange={changeHandler}
-        />
-        <small> Enter table capacity... </small>
-        </div>
-        <button type="button" onClick={() => history.goBack()}>
-          Cancel
-        </button>
-        <button type="submit">
-          Submit
-        </button>
+        <fieldset>
+          <div>
+            <label htmlFor="table_name">Table Name:</label>
+            <input
+              id="table_name"
+              name="table_name"
+              type="text"
+              required
+              value={table.table_name}
+              onChange={changeHandler}
+            />
+          </div>
+          <div>
+            <label htmlFor="capacity">Capacity:</label>
+            <input
+              id="capacity"
+              name="capacity"
+              type="number"
+              required
+              value={table.capacity}
+              onChange={changeHandler}
+            />
+          </div>
+          <div>
+          <button type="submit">
+              Submit
+          </button>
+          <button onClick={() => history.goBack()}>
+            Cancel
+          </button>
+          </div>
+        </fieldset>
       </form>
-    </main>
+    </>
   );
 };
 

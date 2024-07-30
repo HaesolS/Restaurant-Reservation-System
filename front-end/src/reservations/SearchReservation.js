@@ -1,76 +1,59 @@
 import React, { useState } from "react";
-import { listReservations } from "../utils/api";
-import { useHistory } from "react-router-dom";
 import ReservationList from "./ReservationList";
+import ErrorAlert from "../layout/ErrorAlert";
+import { listReservations } from "../utils/api";
 
 function SearchReservation() {
-    const [mobileNumber, setMobileNumber] = useState('');
-    const [reservations, setReservations] = useState(null);
-    const [error, setError] = useState('No reservations found');
-    const history = useHistory();
-  
-    const submitHandler = (event) => {
-        event.preventDefault();
-        setError(null);
-        listReservations({ mobile_number: mobileNumber })
-        .then((res) => {
-          setReservations(res);
-          history.push('/search');
-        })
-        .catch((err) => setError('No reservations found'));
-    }
-  
-    return (
-      <>
-        <h2> Search </h2>
-        <div>
-        <form onSubmit={submitHandler}>
-            <div>
-                <label htmlFor="mobile_number">Mobile Number:</label>
-                <input
-                    id="mobile_number"
-                    name="mobile_number"
-                    type="search"
-                    required
-                    placeholder="Enter a customer's phone number"
-                    value={mobileNumber}
-                    onChange={(event) => setMobileNumber(event.target.value)}
-                />
-            </div>
-            <button type="submit">
-                Find
-            </button>
-        </form>
-        </div>
-        <br />
-        {reservations && reservations.length ?
-        <div>
-          <h3> Matching Reservations </h3>
-          <table>
-            <thead>
-              <th> Reservation ID </th>
-              <th> First Name </th>
-              <th> Last Name </th>
-              <th> Party Size </th>
-              <th> Phone Number </th>
-              <th> Reservation Date </th>
-              <th> Reservation Time </th>
-              <th> Reservation Status </th>
-            </thead>
-            <tbody>
-              {reservations.map((res) => (
-                <ReservationList res={res} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-        :
-        <>
-          <p> {error} </p>
-        </>
-        }
-      </>
-    );
+  const [error, setError] = useState(null);
+  const [mobile_number, setMobileNumber] = useState("");
+  const [reservations, setReservations] = useState([]);
+  const [reservationMessage, setReservationMessage] = useState("");
+
+  const changeHandler = ({ target }) => {
+    setMobileNumber(target.value);
   }
+
+  const findHandler = (event) => {
+    event.preventDefault();
+    const abortController = new AbortController();
+    listReservations({ mobile_number }, abortController.signal)
+      .then((reservations) => setReservations(reservations))
+      .then(setReservationMessage("No reservations found"))
+      .catch((error) => setError(error));
+    return () => abortController.abort();
+  }
+
+  return (
+    <>
+      <div>
+        <h1>Search Reservation</h1>
+        <ErrorAlert error={error} setError={setError} />
+      </div>
+
+      <div id="mobileSearchBox">
+        <input 
+          type="text" 
+          name="mobile_number"
+          onChange={changeHandler}
+          value={mobile_number}
+          placeholder="Enter a customer's phone number" 
+        />
+        <button 
+          type="submit" 
+          onClick={findHandler}>
+            Find
+        </button>
+      </div>
+
+    <div className="reservationList">
+      {reservations.length ? 
+        <ReservationList reservations={reservations} />
+        :
+        <h3>{reservationMessage}</h3>
+      }
+    </div>
+    </>
+  );
+}
 
 export default SearchReservation;

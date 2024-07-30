@@ -8,11 +8,10 @@ export const ReservationForm = ({
 }) => {
   const history = useHistory();
 
-    
-
   return (
     <>
       <form onSubmit={submitHandler}>
+        <fieldset>
             <div>
                 <label htmlFor="first_name">
                     First Name
@@ -25,7 +24,6 @@ export const ReservationForm = ({
                     value={reservation.first_name}
                     onChange={changeHandler}
                 />
-                <small> Enter first name... </small>
             </div>
             <div>
             <label htmlFor="last_name">Last Name</label>
@@ -37,7 +35,6 @@ export const ReservationForm = ({
                 value={reservation.last_name}
                 onChange={changeHandler}
             />
-            <small> Enter last name... </small>
             </div>
             <div>
             <label htmlFor="mobile_number">Mobile Number</label>
@@ -45,13 +42,11 @@ export const ReservationForm = ({
                 type="tel"
                 id="mobile_number"
                 name="mobile_number"
-                placeholder="(xxx) xxx-xxxx"
-                pattern="\d{3}-\d{3}-\d{4}"
+                placeholder="xxx-xxx-xxxx"
                 required
                 value={reservation.mobile_number}
                 onChange={changeHandler}
             />
-            <small> Enter mobile number... </small>
             </div>
             <div>
             <label htmlFor="reservation_date">Date of Reservation</label>
@@ -65,7 +60,6 @@ export const ReservationForm = ({
                 value={reservation.reservation_date}
                 onChange={changeHandler}
             />
-            <small> Open from 10:30AM - 9:30PM and closed on Tuesdays. </small>
             </div>
             <div>
             <label htmlFor="reservation_time">Time of Reservation</label>
@@ -91,15 +85,17 @@ export const ReservationForm = ({
                 min={1}
                 onChange={changeHandler}
             />
-            <small> Enter number of people... </small>
             </div>
+            <div>
             <button type="submit">
                 Submit
             </button>
             <button type="button" onClick={() => history.goBack()}>
                 Cancel
             </button>
-            </form>
+            </div>
+        </fieldset>
+    </form>
     </>
   );
 };

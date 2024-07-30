@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { readReservation, listTables, updateTable } from "../utils/api";
 import { useHistory, useParams } from "react-router";
+import ErrorAlert from "../layout/ErrorAlert";
 
 function ReservationSeat() {
     const [tables, setTables] = useState([]);
@@ -8,6 +9,7 @@ function ReservationSeat() {
     const [reservation, setReservation] = useState({});
     const history = useHistory();
     const { reservation_id } = useParams();
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         listTables().then(setTables);
@@ -22,16 +24,17 @@ function ReservationSeat() {
         setTableId(event.target.value);
       };
 
-    const submitHandler = async (event) => {
+    const submitHandler = (event) => {
         event.preventDefault();
-        event.stopPropagation();
-        await updateTable(reservation.reservation_id, tableId);
-        history.push("/dashboard");
+        updateTable(reservation.reservation_id, tableId)
+        .then(() => history.push("/dashboard"))
+        .catch((error) => setError(error));
       };
 
     return (
         <>
             <h2> Seat Reservation </h2>
+            <ErrorAlert error={error} />
             <form onSubmit={submitHandler}>
                 <fieldset>
                 <div>

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables } from "../utils/api";
+import { listReservations, listTables, finishTable, updateStatus } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, today, next } from "../utils/date-time";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import ReservationList from "../reservations/ReservationList";
 import TableList from "../tables/TableList";
+import moment from "moment";
 
 /**
  * Defines the dashboard page.
@@ -14,139 +15,86 @@ import TableList from "../tables/TableList";
  */
 function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
-  const [currentDate, setCurrentDate] = useState(date);
-  const [tables, setTables] = useState([]);
   const [error, setError] = useState(null);
+  const [tables, setTables] = useState([]);
   const history = useHistory();
-  const location = useLocation();
-  const searchedDate = location.search.slice(-10);
+  const filterResults = true;
 
-  function clearTables(tables) {
-    let result = [];
-    tables.forEach((table) => {
-      if (table.reservation_id) {
-        result.push(table);
-      }
-    })
-    return result;
+  useEffect(loadDashboard, [date]);
+
+  function loadDashboard() {
+    const abortController = new AbortController();
+
+    setError(null);
+    listReservations({ date }, abortController.signal)
+      .then(setReservations)
+      .catch(setError);
+
+    listTables().then(setTables);
+
+    return () => abortController.abort();
   }
-  let clearTableToggler = clearTables(tables);
 
-  useEffect(() => {
-    const abortController = new AbortController();
-    async function loadReservations() {
-      try {
-        if (currentDate === date) {
-          const returnedReservations = await listReservations({ date }, abortController.signal);
-          setReservations(returnedReservations);
-        } else {
-          const returnedReservations = await listReservations({ currentDate }, abortController.signal);
-          setReservations(returnedReservations);
-        }
-      } catch (error) {
-        setError(error);
-      }
-    }
-    loadReservations();
-    return () => abortController.abort();
-  }, [date, currentDate, history.location])
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    async function loadTables() {
-      try {
-        const returnedTables = await listTables();
-        setTables(returnedTables);
-      } catch (error) {
-        setError(error);
-      }
-    }
-    loadTables();
-    return () => abortController.abort();
-  }, [history, date, currentDate])
-
-  useEffect(() => {
-    if (searchedDate && searchedDate !== '') {
-      setCurrentDate(searchedDate);
-    }
-  }, [searchedDate, history]);
-
-  if (reservations) {
-
-    return (
-      <>
-        <h1>Dashboard</h1>
-        <ErrorAlert error={error} />
-        <div>
-          <h2>Reservations for {currentDate}</h2>
-          <div>
-            <button onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>
-              Previous
-            </button>
-            <button onClick={() => history.push(`/dashboard?date=${today()}`)}>
-              Today
-            </button>
-            <button onClick={() => history.push(`/dashboard?date=${next(date)}`)}>
-              Next
-            </button>
-          </div>
-          <div id="reservations">
-            <table>
-              <thead>
-                <tr>
-                  <th> ID </th>
-                  <th> First Name </th>
-                  <th> Last Name </th>
-                  <th> Number of People </th>
-                  <th> Mobile Number </th>
-                  <th> Date </th>
-                  <th> Time </th>
-                  <th> Status </th>
-                  <th> Seat </th>
-                  <th> Edit </th>
-                  <th> Cancel </th>
-                </tr>
-              </thead>
-              <tbody>
-                {reservations.map((res) => (
-                  <ReservationList res={res} key={res.reservation_id} />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div id="tables">
-          <h2>Tables</h2>
-          <table>
-            <thead>
-              <tr>
-                <th> ID </th>
-                <th> Table Name </th>
-                <th> Capacity </th>
-                <th> Reservation ID </th>
-                <th> Table Status </th>
-                {clearTableToggler.length ?
-                <th> Clear Tables </th>
-                :
-                <></>}
-              </tr>
-            </thead>
-            <tbody>
-              {tables.map((table) => (
-                <TableList table={table} key={table.table_id} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </>
+  const finishHandler = (table_id) => (event) => {
+    event.preventDefault();
+    const result = window.confirm(
+      "Is this table ready to seat new guests? This cannot be undone."
     );
-} else {
-  return (
-    <div>
-    <h4> Loading... </h4>
-    </div>
-  )
+
+    if (result) {
+      finishTable(table_id)
+      .then(() => loadDashboard())
+      .catch(setError);
+    }
   }
+
+  const cancelHandler = async (event) => {
+    const result = window.confirm(
+      "Do you want to cancel this reservation? This cannot be undone."
+    );
+
+    if (result) {
+      await updateStatus(event.target.value, "cancelled");
+      loadDashboard();
+    }
+  };
+
+  return (
+    <>
+      <ErrorAlert error={error} />
+      <div>
+        <h2>
+          Reservations for {moment(date).format("dddd MMM DD YYYY")}
+        </h2>
+      </div>
+      <div>
+        <button onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>
+          Previous
+        </button>
+        <button onClick={() => history.push(`/dashboard?date=${today()}`)}>
+          Today
+        </button>
+        <button onClick={() => history.push(`/dashboard?date=${next(date)}`)}>
+          Next
+        </button>
+      </div>
+      <hr></hr>
+      <div id="reservations">
+        <ReservationList
+          reservations={reservations}
+          filterResults={filterResults}
+          cancelHandler={cancelHandler}
+        />
+      </div>
+      <div>
+        <h2>Tables</h2>
+        <hr></hr>
+        <TableList
+          tables={tables}
+          finishHandler={finishHandler} />
+      </div>
+    </>
+  );
 }
 
 export default Dashboard;

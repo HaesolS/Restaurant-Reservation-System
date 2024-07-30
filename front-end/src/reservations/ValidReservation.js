@@ -1,5 +1,6 @@
-export function validReservation(reservation) {
+export function ValidReservation(reservation) {
     const date = reservation.reservation_date;
+    const time = reservation.reservation_time;
     const errors = [];
 
     const day = new Date(date).getUTCDay();

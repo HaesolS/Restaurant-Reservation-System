@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { createReservation } from "../utils/api.js";
-import ErrorAlert from "../layout/ErrorAlert";
+import ReservationError from "../layout/ReservationError";
 import { useHistory } from "react-router-dom";
 import ReservationForm from "./ReservationForm.js";
+import { ValidReservation } from "./ValidReservation.js";
 
-function NewReservation({ date }) {
+export const NewReservation = () => {
     const [reservation, setReservation] = useState({
         first_name: "",
         last_name: "",
@@ -15,10 +16,6 @@ function NewReservation({ date }) {
     })
     const [error, setError] = useState(null);
     const history = useHistory();
-
-    useEffect(() => {
-        return reservation
-    }, [reservation])
 
     const changeHandler = (event) => {
         if (event.target.name === "people") {
@@ -32,31 +29,28 @@ function NewReservation({ date }) {
             [event.target.name]: event.target.value
         });
         }
-    }
+    };
 
-    // const cancelHandler = () => {
-    //     history.goBack()
-    // }
-
-    const submitHandler = (event) => {
+    const submitHandler = async (event) => {
         event.preventDefault();
         const abortController = new AbortController();
-
-        createReservation(
-            reservation,
-            abortController.signal
-        )
-        .then(() => {
+        const errors = ValidReservation(reservation);
+        if (errors.length) {
+            return setError(errors)
+        } 
+        try {
+            await createReservation(reservation, abortController.signal);
             history.push(`/dashboard?date=${reservation.reservation_date}`);
-        })
-        .catch(setError);
+        } catch(error) {
+            setError([error])
+        }
         return () => abortController.abort()
-    }
+    };
 
     return (
         <>
             <h2> New Reservation </h2>
-            <ErrorAlert error={error} />
+            <ReservationError errors={error} />
             <ReservationForm
                 reservation={reservation}
                 changeHandler={changeHandler}
