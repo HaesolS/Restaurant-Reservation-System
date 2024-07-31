@@ -198,10 +198,9 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     hasData,
     hasRequiredProperties,
-    validDate, validTime, validPeople,
+    validDate, validTime, validPeople, validStatus,
     defaultBooked,
     hasReservationId,
-    // reservationExists,
     asyncErrorBoundary(update)
   ],
   updateStatus: [

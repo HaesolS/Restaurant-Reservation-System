@@ -87,7 +87,6 @@ export async function createReservation(reservation, signal) {
 }
 
 export async function updateReservation(reservation, signal) {
-  console.log("reservation", reservation)
   const { reservation_id } = reservation;
   const url = `${API_BASE_URL}/reservations/${reservation_id}`;
   const options = {
@@ -96,9 +95,7 @@ export async function updateReservation(reservation, signal) {
     body: JSON.stringify({ data: { ...reservation } }),
     signal,
   };
-  return await fetchJson(url, options, reservation)
-  .then(formatReservationDate)
-  .then(formatReservationTime);
+  return await fetchJson(url, options, reservation);
 }
 
 export async function updateStatus(data, reservation_id, signal) {
@@ -135,7 +132,6 @@ export async function updateTable(table_id, reservation_id) {
     headers,
     body: JSON.stringify({ data: { reservation_id } })
   };
-  console.log("data", options)
   return await fetchJson(url, options, {});
 }
 

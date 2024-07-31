@@ -20,7 +20,7 @@ function ReservationSeat() {
         listTables(abortController.signal).then(setTables).catch(setTablesError);
 
         return () => abortController.abort();
-    }, []);
+    }, [reservation_id]);
 
     useEffect(() => {
         const abortController = new AbortController();
@@ -43,7 +43,7 @@ function ReservationSeat() {
             table_id: tableId,
             foo: reservation_id
         })
-        updateTable(reservation.reservation_id, tableId)
+        updateTable(tableId, reservation_id)
         .then(() => history.push("/dashboard"))
         .catch(setSubmitError);
     };

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { readReservation, updateReservation } from "../utils/api";
-import ErrorAlert from "../layout/ErrorAlert";
+import ReservationError from "../layout/ReservationError";
 import { useHistory, useParams } from "react-router-dom";
 import ReservationForm from "./ReservationForm";
+import { ValidReservation } from "./ValidReservation";
 
-function EditReservation() {
+export const EditReservation = () => {
     const initialState = {
       first_name: "",
       last_name: "",
@@ -43,22 +44,26 @@ function EditReservation() {
       }
   }
     
-    const submitHandler = (event) => {
+    const submitHandler = async (event) => {
       event.preventDefault();
       const abortController = new AbortController();
-      updateReservation(reservation, abortController.signal)
-      .then((res) => {
-        setReservation({ ...res });
+      const errors = ValidReservation(reservation);
+      if (errors.length) {
+        return setError(errors);
+      }
+      try {
+        await updateReservation(reservation, abortController.signal);
         history.push(`/dashboard?date=${reservation.reservation_date}`);
-      })
-      .catch(setError);
+      } catch (error) {
+        setError([error]);
+      }
       return () => abortController.abort();
     }
   
     return (
       <>
         <h2> Edit Reservation </h2>
-        <ErrorAlert error={error} />
+        <ReservationError errors={error} />
         <ReservationForm
             reservation={reservation}
             changeHandler={changeHandler}

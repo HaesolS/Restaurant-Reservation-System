@@ -61,7 +61,8 @@ function Dashboard({ date }) {
     );
 
     if (result) {
-      await updateStatus(event.target.value, "cancelled");
+      await updateStatus( { status: "cancelled" }, event.target.value);
+      console.log(event.target.value)
       loadDashboard();
     }
   };
