@@ -16,6 +16,7 @@ import moment from "moment";
 function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
   const [error, setError] = useState(null);
+  const [tablesError, setTablesError] = useState(null);
   const [tables, setTables] = useState([]);
   const history = useHistory();
   const filterResults = true;
@@ -30,22 +31,28 @@ function Dashboard({ date }) {
       .then(setReservations)
       .catch(setError);
 
-    listTables().then(setTables);
+    listTables(abortController.signal).then(setTables).catch(setTablesError);
 
     return () => abortController.abort();
   }
 
-  const finishHandler = (table_id) => (event) => {
-    event.preventDefault();
-    const result = window.confirm(
-      "Is this table ready to seat new guests? This cannot be undone."
-    );
+  // const finishHandler = (table_id) => (event) => {
+  //   event.preventDefault();
+  //   const result = window.confirm(
+  //     "Is this table ready to seat new guests? This cannot be undone."
+  //   );
 
-    if (result) {
-      finishTable(table_id)
-      .then(() => loadDashboard())
-      .catch(setError);
-    }
+  //   if (result) {
+  //     finishTable(table_id)
+  //     .then(() => loadDashboard())
+  //     .catch(setError);
+  //   }
+  // }
+
+  function onFinish(table_id, reservation_id) {
+    finishTable(table_id, reservation_id)
+    .then(loadDashboard)
+    .catch(setTablesError);
   }
 
   const cancelHandler = async (event) => {
@@ -89,9 +96,10 @@ function Dashboard({ date }) {
       <div>
         <h2>Tables</h2>
         <hr></hr>
+        <ErrorAlert error={tablesError} />
         <TableList
           tables={tables}
-          finishHandler={finishHandler} />
+          onFinish={onFinish} />
       </div>
     </>
   );
