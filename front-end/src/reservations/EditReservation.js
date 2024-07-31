@@ -6,7 +6,7 @@ import ReservationForm from "./ReservationForm";
 
 function EditReservation() {
     const initialState = {
-      first_name: "alfonso",
+      first_name: "",
       last_name: "",
       mobile_number: "",
       reservation_date: "",

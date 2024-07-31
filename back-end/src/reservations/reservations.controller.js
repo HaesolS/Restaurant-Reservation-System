@@ -101,6 +101,20 @@ function defaultBooked(req, res, next) {
   next();
 }
 
+function hasReservationId(req, res, next) {
+  const reservation = req.params.reservation_id || req.body?.data?.reservation_id;
+
+  if(reservation){
+      res.locals.reservation_id = reservation;
+      next();
+  } else {
+      next({
+          status: 400,
+          message: `missing reservation_id`,
+      });
+  }
+}
+
 async function reservationExists(req, res, next) {
   const { reservation_id } = req.params;
   const reservation = await service.read(reservation_id);
@@ -186,6 +200,8 @@ module.exports = {
     hasRequiredProperties,
     validDate, validTime, validPeople,
     defaultBooked,
+    hasReservationId,
+    // reservationExists,
     asyncErrorBoundary(update)
   ],
   updateStatus: [
@@ -194,6 +210,5 @@ module.exports = {
     validStatus,
     isFinished,
     asyncErrorBoundary(update)
-  ],
-  reservationExists
+  ]
 };

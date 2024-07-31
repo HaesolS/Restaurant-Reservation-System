@@ -92,15 +92,30 @@ async function tableExists(req, res, next) {
 
 async function reservationExists(req, res, next) {
   const { reservation_id } = req.body.data;
-  const reservation = await service.readReservation(reservation_id);
-  if (reservation) {
-    res.locals.reservation = reservation;
-    return next();
-  }
-  next({
-    status: 404,
-    message: `reservation_id ${reservation_id} does not exist`,
-  })
+  if (!reservation_id)
+    return next({
+      status: 400,
+      message: "Request must have 'reservation_id'.",
+    });
+  const foundRes = await service.readReservation(reservation_id);
+  if (foundRes) {
+    res.locals.reservation = foundRes;
+    next();
+  } else
+    next({
+      status: 404,
+      message: `Reservation ${reservation_id} does not exist.`,
+    });
+  // const { reservation_id } = req.body.data;
+  // const reservation = await service.readReservation(reservation_id);
+  // if (reservation) {
+  //   res.locals.reservation = reservation;
+  //   return next();
+  // }
+  // next({
+  //   status: 404,
+  //   message: `reservation_id ${reservation_id} does not exist`,
+  // })
 }
 
 function hasData(req, res, next) {
