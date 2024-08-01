@@ -144,6 +144,7 @@ function isFinished(req, res, next) {
  */
 
 async function list(req, res) {
+  const today = new Date();
   if (req.query.date) {
     const data = await service.list(req.query.date);
     res.json({ data });
@@ -151,7 +152,7 @@ async function list(req, res) {
     const data = await service.search(req.query.mobile_number);
     res.json({ data });
   } else {
-    const data = await service.list(today());
+    const data = await service.list(today);
     res.json({ data });
   }
 }
