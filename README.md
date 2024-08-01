@@ -1,30 +1,26 @@
 <h1>Restaurant Reservation System</h1>
 <p>You'll need to create a full-stack web app that uses the stack that you've learned in this program: React on the client and Node.js and Express for the API. You'll also need to use PostgreSQL for your database.</p>
-<h2>Final capstone requirements</h2>
-<h3>General requirements</h3>
+<img src="https://github.com/user-attachments/assets/25667c47-68a1-4d88-9578-88699b65e113">
+
+<h2>Technology</h2>
 <p>
   <ul>
-    <li>Your app must be a full-stack app using React.js, CSS, Node.js, Express, and PostgreSQL.</li>
-    <li>All code must be high quality, error free, commented as necessary, and clean.</li>
+    <li>React.js</li>
+    <li>CSS</li>
+    <li>Node.js</li>
+    <li>Express</li>
+    <li>PostgreSQL</li>
   </ul>
 </p>
-<h3>Backend requirements</h3>
+<h2>Installation</h2>
 <p>
   <ul>
-    <li>Your backend must be a Node, Express, and PostgreSQL API.</li>
-    <li>You must at least create, read, and update multiple resources within the application. The user stories in the final capstone will cover these requirements.</li>
+    <li>Fork and clone this repository.</li>
+    <li>Run <code>cp ./back-end/.env.sample ./back-end/.env</code>.</li>
+    <li>Update the <code>./back-end/.env</code> file with the connection URL's to your PostgreSQL database instance.</li>
+    <li>Run <code>cp ./front-end/.env.sample ./front-end/.env</code>.
+    <li>You should not need to make changes to the <code>./front-end/.env</code> file unless you want to connect to a backend at a location other than <code>http://localhost:5001</code>.</li>
+    <li>Run <code>npm install</code> to install project dependencies.</li>
+    <li>Run <code>npm run start:dev</code> to start your server in development mode.</li>
   </ul>
 </p>
-<h3>Frontend requirements</h3>
-<p>
-  <ul>
-    <li>Use React along with the API that you built as part of the final capstone.</li>
-    <li>Your app must be responsive and work just as well on mobile devices as it does on desktop devices.</li>
-    <li>You may use vanilla CSS or Bootstrap for styling the frontend.</li>
-    <li>The styling on your client must be polished. In other words, you need to choose fonts and colors that make sense, correctly size the various components, and make sure that it looks great on both mobile and desktop devices.</li>
-  </ul>
-</p>
-<h3>Deployment requirements</h3>
-<p>
-  <ul>
-    <li>You must deploy a live, publicly accessible version of your application.</li>
