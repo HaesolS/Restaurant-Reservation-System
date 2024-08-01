@@ -36,19 +36,6 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  // const finishHandler = (table_id) => (event) => {
-  //   event.preventDefault();
-  //   const result = window.confirm(
-  //     "Is this table ready to seat new guests? This cannot be undone."
-  //   );
-
-  //   if (result) {
-  //     finishTable(table_id)
-  //     .then(() => loadDashboard())
-  //     .catch(setError);
-  //   }
-  // }
-
   function onFinish(table_id, reservation_id) {
     finishTable(table_id, reservation_id)
     .then(loadDashboard)
@@ -62,7 +49,6 @@ function Dashboard({ date }) {
 
     if (result) {
       await updateStatus( { status: "cancelled" }, event.target.value);
-      console.log(event.target.value)
       loadDashboard();
     }
   };

@@ -28,7 +28,7 @@ function validDate(req, res, next) {
   );
   res.locals.time = reservationDate;
   const today = new Date();
-  if (isNaN(reservationDate.getDate())) {
+  if (!reservation_date || reservationDate == "Invalid Date") {
       next({
           message: `reservation_date / reservation_time incorrect`,
           status: 400,
@@ -198,7 +198,7 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     hasData,
     hasRequiredProperties,
-    validPeople,
+    validDate, validTime, validPeople,
     defaultBooked,
     hasReservationId,
     asyncErrorBoundary(update)

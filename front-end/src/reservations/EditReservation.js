@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { readReservation, updateReservation } from "../utils/api";
-import ErrorAlert from "../layout/ErrorAlert";
+import ReservationError from "../layout/ReservationError";
 import { useHistory, useParams } from "react-router-dom";
 import ReservationForm from "./ReservationForm";
+import { ValidReservation } from "./ValidReservation.js";
 
 function EditReservation() {
     const initialState = {
@@ -22,12 +23,21 @@ function EditReservation() {
       const abortController = new AbortController();
       setError(null);
       readReservation(reservation_id, abortController.signal)
-      .then(setReservation)
+      .then(data => setReservation(data))
       .catch(setError);
-
-
       return () => abortController.abort();
     }, [reservation_id]);
+
+    useEffect(() => {
+      if (reservation.reservation_time) {
+        let timeParts = reservation.reservation_time.split(":");
+        let newReservationTime = timeParts[0] + ":" + timeParts[1];
+        setReservation(prev => ({
+          ...prev,
+          reservation_time: newReservationTime
+        }));
+      }
+    }, [reservation.reservation_time])
      
     const changeHandler = (event) => {
       if (event.target.name === "people") {
@@ -43,22 +53,25 @@ function EditReservation() {
       }
   }
     
-    const submitHandler = (event) => {
+    const submitHandler = async (event) => {
       event.preventDefault();
       const abortController = new AbortController();
-      updateReservation(reservation, abortController.signal)
-      .then((res) => {
-        setReservation({ ...res });
+      const errors = ValidReservation(reservation);
+      if (errors.length) {
+        return setError(errors)
+      } 
+      try {
+        await updateReservation(reservation, abortController.signal)
         history.push(`/dashboard?date=${reservation.reservation_date}`);
-      })
-      .catch(setError);
+      } catch(error) {
+          setError([error])
+      }
       return () => abortController.abort();
     }
-  
     return (
       <>
         <h2> Edit Reservation </h2>
-        <ErrorAlert error={error} />
+        <ReservationError errors={error} />
         <ReservationForm
             reservation={reservation}
             changeHandler={changeHandler}

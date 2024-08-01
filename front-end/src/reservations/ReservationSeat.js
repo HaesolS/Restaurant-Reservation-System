@@ -38,11 +38,6 @@ function ReservationSeat() {
         event.preventDefault();
         event.stopPropagation();
         setSubmitError(null)
-        console.log({
-            reservation: reservation.reservation_id,
-            table_id: tableId,
-            foo: reservation_id
-        })
         updateTable(tableId, reservation_id)
         .then(() => history.push("/dashboard"))
         .catch(setSubmitError);
@@ -82,9 +77,6 @@ function ReservationSeat() {
                                     <option
                                         key={table.table_id}
                                         value={table.table_id}
-                                        // disabled={
-                                        //     table.capacity < reservation.people || table.occupied
-                                        // }
                                     >
                                         {table.table_name} - {table.capacity}
                                     </option>

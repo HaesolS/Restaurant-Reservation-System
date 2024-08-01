@@ -71,6 +71,7 @@ export const ReservationForm = ({
                 pattern="[0-9]{2}:[0-9]{2}"
                 required
                 value={reservation.reservation_time}
+                maxLength="100"
                 onChange={changeHandler}
             />
             </div>
