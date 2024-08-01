@@ -1,5 +1,7 @@
 <h1>Restaurant Reservation System</h1>
 <p>You'll need to create a full-stack web app that uses the stack that you've learned in this program: React on the client and Node.js and Express for the API. You'll also need to use PostgreSQL for your database.</p>
+<img src="https://github.com/user-attachments/assets/25667c47-68a1-4d88-9578-88699b65e113">
+
 <h2>Technology</h2>
 <p>
   <ul>
