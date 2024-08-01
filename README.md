@@ -21,7 +21,8 @@
     <li>Update the <code>./back-end/.env</code> file with the connection URL's to your PostgreSQL database instance.</li>
     <li>Run <code>cp ./front-end/.env.sample ./front-end/.env</code>.
     <li>You should not need to make changes to the <code>./front-end/.env</code> file unless you want to connect to a backend at a location other than <code>http://localhost:5001</code>.</li>
-    <li>Run <code>npm install</code> to install project dependencies.</li>
+    <li>Run <code>npm install</code> on to install project dependencies.</li>
+    <li>Run <code>nvm use 16.20.0</code>.
     <li>Run <code>npm run start:dev</code> to start your server in development mode.</li>
   </ul>
 </p>
