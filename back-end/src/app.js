@@ -12,11 +12,11 @@ const tablesRouter = require("./tables/tables.router");
 
 const app = express();
 
-let corsOptions = { 
-    origin : ['*', 'http://localhost:3000'], 
-    } 
+// let corsOptions = { 
+//     origin : ['*', 'http://localhost:3000'], 
+//     } 
 
-app.use(cors(corsOptions))
+app.use(cors());
 app.use(express.json());
 
 app.use("/reservations", reservationsRouter);

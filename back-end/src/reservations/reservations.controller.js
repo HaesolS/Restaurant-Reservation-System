@@ -142,9 +142,9 @@ function isFinished(req, res, next) {
 /**
  * List handler for reservation resources
  */
-
+// TODO: revisit so we get http://localhost:5001/reservations
 async function list(req, res) {
-  const today = new Date();
+   const today = new Date();
   if (req.query.date) {
     const data = await service.list(req.query.date);
     res.json({ data });
