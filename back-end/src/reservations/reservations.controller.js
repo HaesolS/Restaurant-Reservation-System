@@ -139,10 +139,24 @@ function isFinished(req, res, next) {
   next();
 }
 
+function validMobile(req, res, next) {
+  let { mobile_number } = req.body.data;
+  const remove = mobile_number.replace(/\D/g, '');
+  const number = Number(remove);
+  console.log("mobile_numberrr", number, typeof number)
+  if (isNaN(number)) {
+      next({
+          message: "mobile_number has to be a number",
+          status: 400,
+      });
+  }
+  next();
+}
+
 /**
  * List handler for reservation resources
  */
-// TODO: revisit so we get http://localhost:5001/reservations
+
 async function list(req, res) {
    const today = new Date();
   if (req.query.date) {
@@ -191,7 +205,7 @@ module.exports = {
   create: [
     hasData,
     hasRequiredProperties,
-    validDate, validTime, validPeople,
+    validDate, validTime, validPeople, validMobile,
     defaultBooked,
     asyncErrorBoundary(create)
   ],
@@ -199,7 +213,7 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     hasData,
     hasRequiredProperties,
-    validDate, validTime, validPeople,
+    validDate, validTime, validPeople, validMobile,
     defaultBooked,
     hasReservationId,
     asyncErrorBoundary(update)
